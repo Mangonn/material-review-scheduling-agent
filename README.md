@@ -38,6 +38,8 @@ python3 -m src.cli examples/inputs/conflict.json --mode deepseek --db work/deeps
 
 默认模型 `deepseek-flash`，可用 `DEEPSEEK_MODEL` 更改。使用 DeepSeek Chat Completions 的函数调用；API 设置依据 [DeepSeek 官方工具调用](https://api-docs.deepseek.com/guides/tool_calls/)和[Chat Completions 文档](https://api-docs.deepseek.com/api/create-chat-completion/)。
 
+准备提交真实模型验收记录时运行 `python3 examples/run_model_examples.py --mode deepseek`；它用独立数据库执行冲突和规则风险两条路径，并在 `examples/model_outputs/` 与 `examples/model_traces/` 保存实际结果。
+
 OpenAI：
 
 ```bash

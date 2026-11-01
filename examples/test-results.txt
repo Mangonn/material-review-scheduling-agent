@@ -12,6 +12,6 @@ test_tool_limit_returns_incomplete (test_agent.AgentAcceptanceTests.test_tool_li
 test_wrong_approval_does_not_change_hard_time (test_agent.AgentAcceptanceTests.test_wrong_approval_does_not_change_hard_time) ... ok
 
 ----------------------------------------------------------------------
-Ran 12 tests in 0.011s
+Ran 12 tests in 0.018s
 
 OK
