@@ -1,6 +1,6 @@
 # 03 评估结果与限制
 
-2026-11-01 在 Python 3.14.3 执行 `python3 -m unittest discover -s tests -v`：**14 项通过**，原始记录见 [test-results.txt](../examples/test-results.txt)。下表离线示例由真实 CLI 调用生成，命令为 `python3 examples/run_examples.py`；输出和独立 Trace 均保存在 `examples/`，模式为 `mock_policy`。
+2026-11-01 在 Python 3.14.3 执行 `python3 -m unittest discover -s tests -v`：**15 项通过**，原始记录见 [test-results.txt](../examples/test-results.txt)。下表离线示例由真实 CLI 调用生成，命令为 `python3 examples/run_examples.py`；输出和独立 Trace 均保存在 `examples/`，模式为 `mock_policy`。
 
 | 验收点 | 输入 | 实际输出 | Trace | 实际结果 |
 | --- | --- | --- | --- | --- |
@@ -12,7 +12,7 @@
 | 明确确认 | [approved_change](../examples/inputs/approved_change.json) | [approved_change](../examples/outputs/approved_change.json) | [approved_change](../examples/traces/approved_change.json) | 只更新草稿状态，未发布 |
 | 保存失败 | 同 [normal](../examples/inputs/normal.json)，加 `--fail-save` | [save_failure](../examples/outputs/save_failure.json) | [save_failure](../examples/traces/save_failure.json) | `failed` 与 `simulated_storage_failure`，数据库无草稿 |
 
-`test_step_limit_returns_incomplete` 与 `test_tool_limit_returns_incomplete` 验证超限返回明确未完成；`test_model_cannot_save_without_observed_review` 验证模型越过审核直接保存时被工具拒绝。
+`test_step_limit_returns_incomplete` 与 `test_tool_limit_returns_incomplete` 验证超限返回明确未完成；`test_model_cannot_save_without_observed_review` 验证模型越过审核直接保存时被工具拒绝；`test_unavailable_database_returns_structured_failure` 验证数据库无法打开时返回明确失败。
 
 ## 真实模型决策记录
 

@@ -11,9 +11,10 @@ test_rule_risk_blocks_save (test_agent.AgentAcceptanceTests.test_rule_risk_block
 test_save_failure_is_explicit_and_not_counted_as_saved (test_agent.AgentAcceptanceTests.test_save_failure_is_explicit_and_not_counted_as_saved) ... ok
 test_step_limit_returns_incomplete (test_agent.AgentAcceptanceTests.test_step_limit_returns_incomplete) ... ok
 test_tool_limit_returns_incomplete (test_agent.AgentAcceptanceTests.test_tool_limit_returns_incomplete) ... ok
+test_unavailable_database_returns_structured_failure (test_agent.AgentAcceptanceTests.test_unavailable_database_returns_structured_failure) ... ok
 test_wrong_approval_does_not_change_hard_time (test_agent.AgentAcceptanceTests.test_wrong_approval_does_not_change_hard_time) ... ok
 
 ----------------------------------------------------------------------
-Ran 14 tests in 0.014s
+Ran 15 tests in 0.060s
 
 OK

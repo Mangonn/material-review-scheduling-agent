@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -51,6 +52,11 @@ def main() -> int:
         else:
             print(content, end="")
         return 0 if result["completion_status"] in ("draft_ready", "pending_confirmation", "blocked", "needs_input") else 2
+    except sqlite3.Error as exc:
+        print(json.dumps({"completion_status": "failed", "draft_status": "failed",
+                          "save_error": f"storage_unavailable:{type(exc).__name__}",
+                          "published": False}, ensure_ascii=False), file=sys.stderr)
+        return 2
     except (ValueError, OSError, json.JSONDecodeError) as exc:
         print(json.dumps({"error": str(exc), "completion_status": "invalid_input"}, ensure_ascii=False), file=sys.stderr)
         return 2

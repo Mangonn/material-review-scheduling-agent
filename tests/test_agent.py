@@ -2,6 +2,8 @@ import json
 import io
 import os
 import sqlite3
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -94,6 +96,18 @@ class AgentAcceptanceTests(unittest.TestCase):
         self.assertEqual(result["draft_status"], "failed")
         self.assertEqual(result["save_error"], "simulated_storage_failure")
         self.assertEqual(self.count(), 0)
+
+    def test_unavailable_database_returns_structured_failure(self):
+        completed = subprocess.run(
+            [sys.executable, "-m", "src.cli", "examples/inputs/normal.json", "--db", "data"],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        result = json.loads(completed.stderr)
+        self.assertEqual(completed.returncode, 2)
+        self.assertEqual(result["completion_status"], "failed")
+        self.assertEqual(result["draft_status"], "failed")
+        self.assertTrue(result["save_error"].startswith("storage_unavailable:"))
+        self.assertFalse(result["published"])
 
     def test_step_limit_returns_incomplete(self):
         result = self.case("normal", max_steps=2)
