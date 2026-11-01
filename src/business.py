@@ -132,6 +132,11 @@ class BusinessTools:
         ) else "ready_for_confirmation"
         try:
             self.db.execute("BEGIN IMMEDIATE")
+            # A concurrent identical request may have committed after the first lookup.
+            existing = self.existing(key)
+            if existing:
+                self.db.rollback()
+                return {"saved": True, "duplicate": True, "draft": existing}
             if self._occupied(slot):
                 self.db.rollback()
                 return {"saved": False, "error": "slot_became_occupied"}

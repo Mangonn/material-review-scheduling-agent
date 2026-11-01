@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 from .agent import run
-from .models import MockPolicy, OpenAIModel, DeepSeekModel
+from .models import MockPolicy, OpenAIModel, DeepSeekModel, ModelUnavailableError
 
 
 def load_local_env() -> None:
@@ -40,7 +40,8 @@ def main() -> int:
     args = parser.parse_args()
     try:
         request = json.loads(args.input.read_text(encoding="utf-8"))
-        load_local_env()
+        if args.mode != "mock":
+            load_local_env()
         model = {"mock": MockPolicy, "openai": OpenAIModel, "deepseek": DeepSeekModel}[args.mode]()
         args.db.parent.mkdir(parents=True, exist_ok=True)
         result = run(request, model=model, db_path=args.db, fail_save=args.fail_save,
@@ -52,6 +53,12 @@ def main() -> int:
         else:
             print(content, end="")
         return 0 if result["completion_status"] in ("draft_ready", "pending_confirmation", "blocked", "needs_input") else 2
+    except ModelUnavailableError as exc:
+        print(json.dumps({"completion_status": "model_unavailable", "mode": args.mode,
+                          "error": str(exc),
+                          "hint": "Use --mode mock for offline flow checks; mock does not prove model decisions."},
+                         ensure_ascii=False), file=sys.stderr)
+        return 2
     except sqlite3.Error as exc:
         print(json.dumps({"completion_status": "failed", "draft_status": "failed",
                           "save_error": f"storage_unavailable:{type(exc).__name__}",

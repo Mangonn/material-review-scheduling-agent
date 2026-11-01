@@ -17,7 +17,7 @@
         "revision": 1
       }
     },
-    "decision_basis": "Start review of M01 metadata before slot checks.",
+    "decision_basis": "Read metadata for M01 before checking review rules.",
     "model_turn": 1,
     "next_action": "check_rules"
   },
@@ -76,7 +76,7 @@
         "2026-11-04T18:00:00+08:00"
       ]
     },
-    "decision_basis": "Check alternative slot 19:00 since requested slot is occupied.",
+    "decision_basis": "Requested slot is occupied; check the first alternative.",
     "model_turn": 4,
     "next_action": "save_draft"
   },
@@ -98,7 +98,7 @@
         "status": "pending_confirmation"
       }
     },
-    "decision_basis": "Rules approved, no missing fields; requested slot occupied, alternative 19:00 verified free. Saving proposal as pending confirmation only.",
+    "decision_basis": "M01 passed review (no missing fields or risks, status approved). Requested hard slot 18:00 is occupied by EXISTING-01; no approved_alternative_slot was supplied, so saving the verified free alternativ",
     "model_turn": 5,
     "next_action": "finish"
   },
@@ -108,7 +108,7 @@
     "action": "finish",
     "arguments": {},
     "observation": "stopped",
-    "decision_basis": "M01 metadata complete and rules approved (no risks). Hard requested slot 2026-11-03T18:00 occupied by EXISTING-01; alternative 19:00 verified free and saved as pending_confirmation proposal. No approv",
+    "decision_basis": "M01 metadata complete and rules approved; requested hard slot 18:00 unavailable (occupied by EXISTING-01). Alternative 19:00 verified free and saved as pending_confirmation proposal (not approved/publ",
     "model_turn": 6,
     "next_action": null
   }

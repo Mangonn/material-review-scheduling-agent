@@ -9,9 +9,9 @@
 ```bash
 python3 -m unittest discover -s tests -v
 python3 examples/run_examples.py
-python3 -m src.cli examples/inputs/conflict.json --db work/review.sqlite3
-python3 -m src.cli examples/inputs/conflict.json --db work/review.sqlite3
-python3 -m src.cli examples/inputs/approved_change.json --db work/review.sqlite3
+python3 -m src.cli examples/inputs/conflict.json --mode mock --db work/review.sqlite3
+python3 -m src.cli examples/inputs/conflict.json --mode mock --db work/review.sqlite3
+python3 -m src.cli examples/inputs/approved_change.json --mode mock --db work/review.sqlite3
 ```
 
 前三次 CLI 运行依次展示：冲突后建议 19:00 并待确认、重复请求返回同一草稿、用户明确确认后更新草稿时段状态。每次输出均含步骤、参数、工具结果、后续动作和简短决策依据。`work/review.sqlite3` 是本地状态，可删除后重跑。
@@ -19,18 +19,18 @@ python3 -m src.cli examples/inputs/approved_change.json --db work/review.sqlite3
 ## 其他验收命令
 
 ```bash
-python3 -m src.cli examples/inputs/normal.json --db work/normal.sqlite3
-python3 -m src.cli examples/inputs/missing.json --db work/missing.sqlite3
-python3 -m src.cli examples/inputs/risk.json --db work/risk.sqlite3
-python3 -m src.cli examples/inputs/normal.json --db work/failure.sqlite3 --fail-save
-python3 -m src.cli examples/inputs/normal.json --db work/limit.sqlite3 --max-steps 2
+python3 -m src.cli examples/inputs/normal.json --mode mock --db work/normal.sqlite3
+python3 -m src.cli examples/inputs/missing.json --mode mock --db work/missing.sqlite3
+python3 -m src.cli examples/inputs/risk.json --mode mock --db work/risk.sqlite3
+python3 -m src.cli examples/inputs/normal.json --mode mock --db work/failure.sqlite3 --fail-save
+python3 -m src.cli examples/inputs/normal.json --mode mock --db work/limit.sqlite3 --max-steps 2
 ```
 
 失败与未完成情形返回退出码 2，并在 JSON 中给出 `completion_status`、`save_error` 或 `stop_reason`。示例的实际输出在 [examples/outputs](examples/outputs)，独立 Trace 在 [examples/traces](examples/traces)，测试记录在 [examples/test-results.txt](examples/test-results.txt)。
 
 ## 真实模型入口
 
-DeepSeek：在根目录创建被 `.gitignore` 排除的 `.env`，填入 `DEEPSEEK_API_KEY=...`，然后执行：
+DeepSeek：在根目录执行 `cp .env.example .env`，在 `.env` 中填入 `DEEPSEEK_API_KEY=...`，然后执行：
 
 ```bash
 python3 -m src.cli examples/inputs/conflict.json --mode deepseek --db work/deepseek.sqlite3
@@ -50,7 +50,7 @@ export OPENAI_MODEL='gpt-6.1-sol'
 python3 -m src.cli examples/inputs/conflict.json --mode openai --db work/model.sqlite3
 ```
 
-真实模式每一步均由模型从 `read_material`、`check_rules`、`query_slot`、`save_draft`、`finish` 中选择，工具输出再送回模型。OpenAI 模式使用 Responses API，结构参考 [OpenAI 官方函数调用文档](https://developers.openai.com/api/docs/guides/function-calling)。`--mode mock` 是默认的确定性离线策略，只验证流程、工具和防护；两条 DeepSeek 真实运行记录证明了本次样例的模型观察与后续动作，但不代表所有输入上的效果。
+真实模式每一步均由模型从 `read_material`、`check_rules`、`query_slot`、`save_draft`、`finish` 中选择，工具输出再送回模型。OpenAI 模式使用 Responses API，结构参考 [OpenAI 官方函数调用文档](https://developers.openai.com/api/docs/guides/function-calling)。`--mode mock` 是默认的确定性离线策略，只验证流程、工具和防护；两条 DeepSeek 真实运行记录证明了本次样例的模型观察与后续动作，但不代表所有输入上的效果。真实模式缺少密钥时返回 `model_unavailable`，不会悄悄切换到 Mock；可显式加 `--mode mock` 离线运行。
 
 ## 输入和结果
 

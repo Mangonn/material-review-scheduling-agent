@@ -5,12 +5,17 @@ import sqlite3
 import subprocess
 import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import redirect_stdout
+from threading import Barrier
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 from src.agent import run
-from src.models import MockPolicy, DeepSeekModel
+from src.business import BusinessTools
+from src.cli import main as cli_main
+from src.models import MockPolicy, DeepSeekModel, OpenAIModel
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -69,6 +74,39 @@ class AgentAcceptanceTests(unittest.TestCase):
         self.assertEqual(again["draft"]["request_key"], first["draft"]["request_key"])
         self.assertEqual(self.count(), 1)
 
+    def test_concurrent_duplicate_requests_reuse_one_draft(self):
+        request = json.loads((ROOT / "examples/inputs/normal.json").read_text())
+        barrier = Barrier(2)
+
+        def worker():
+            tools = BusinessTools(self.db)
+            try:
+                slot = request["requested_slot"]
+                evidence = {"read_material": tools.read_material(request["material_id"]),
+                            "check_rules": tools.check_rules(request["material_id"]),
+                            "queried_slots": {slot: tools.query_slot(slot)}}
+                original_existing = tools.existing
+                first_lookup = True
+
+                def synchronized_existing(key):
+                    nonlocal first_lookup
+                    result = original_existing(key)
+                    if first_lookup:
+                        first_lookup = False
+                        barrier.wait(timeout=5)
+                    return result
+
+                tools.existing = synchronized_existing
+                return tools.save_draft(request, slot, evidence)
+            finally:
+                tools.close()
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(lambda _: worker(), range(2)))
+        self.assertTrue(all(item["saved"] for item in results))
+        self.assertEqual(sorted(item["duplicate"] for item in results), [False, True])
+        self.assertEqual(self.count(), 1)
+
     def test_exact_user_approval_updates_existing_draft_without_publishing(self):
         self.case("conflict")
         confirmed = self.case("approved_change")
@@ -108,6 +146,33 @@ class AgentAcceptanceTests(unittest.TestCase):
         self.assertEqual(result["draft_status"], "failed")
         self.assertTrue(result["save_error"].startswith("storage_unavailable:"))
         self.assertFalse(result["published"])
+
+    def test_missing_real_model_key_points_to_offline_mock(self):
+        for mode, key in (("deepseek", "DEEPSEEK_API_KEY"), ("openai", "OPENAI_API_KEY")):
+            with self.subTest(mode=mode):
+                environment = os.environ.copy()
+                environment[key] = ""
+                completed = subprocess.run(
+                    [sys.executable, "-m", "src.cli", "examples/inputs/normal.json",
+                     "--mode", mode, "--db", str(self.db)],
+                    cwd=ROOT, env=environment, capture_output=True, text=True, check=False,
+                )
+                result = json.loads(completed.stderr)
+                self.assertEqual(completed.returncode, 2)
+                self.assertEqual(result["completion_status"], "model_unavailable")
+                self.assertIn("--mode mock", result["hint"])
+                self.assertIn("does not prove model decisions", result["hint"])
+
+    def test_mock_mode_does_not_read_model_env_file(self):
+        output = io.StringIO()
+        arguments = ["src.cli", "examples/inputs/normal.json", "--mode", "mock",
+                     "--db", str(self.db)]
+        with patch.object(sys, "argv", arguments), patch(
+            "src.cli.load_local_env", side_effect=AssertionError("mock read model config")
+        ), redirect_stdout(output):
+            code = cli_main()
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(output.getvalue())["mode"], "mock_policy")
 
     def test_step_limit_returns_incomplete(self):
         result = self.case("normal", max_steps=2)
@@ -164,6 +229,32 @@ class AgentAcceptanceTests(unittest.TestCase):
         self.assertEqual(json.loads(payloads[1]["messages"][-1]["content"]), {"found": True})
         self.assertEqual(payloads[1]["tool_choice"], "required")
         self.assertEqual(payloads[1]["thinking"], {"type": "disabled"})
+
+    def test_openai_adapter_returns_observation_to_model(self):
+        responses = [
+            {"id": "resp_1", "output": [{"type": "function_call", "call_id": "call_1",
+             "name": "read_material", "arguments": '{"material_id":"M01","reason":"read"}'}]},
+            {"id": "resp_2", "output": [{"type": "function_call", "call_id": "call_2",
+             "name": "finish", "arguments": '{"reason":"done"}'}]},
+        ]
+        payloads = []
+
+        def fake_urlopen(http_request, timeout):
+            payloads.append(json.loads(http_request.data))
+            return io.BytesIO(json.dumps(responses[len(payloads) - 1]).encode())
+
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only"}), patch(
+            "urllib.request.urlopen", side_effect=fake_urlopen
+        ):
+            model = OpenAIModel()
+            first = model.decide({"material_id": "M01"}, {})
+            model.observe({"found": True})
+            second = model.decide({"material_id": "M01"}, {})
+        self.assertEqual(first["name"], "read_material")
+        self.assertEqual(second["name"], "finish")
+        self.assertEqual(payloads[1]["previous_response_id"], "resp_1")
+        self.assertEqual(payloads[1]["input"][0]["call_id"], "call_1")
+        self.assertEqual(json.loads(payloads[1]["input"][0]["output"]), {"found": True})
 
     def test_deepseek_parallel_reads_are_observed_before_next_model_call(self):
         responses = [

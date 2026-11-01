@@ -1,3 +1,4 @@
+test_concurrent_duplicate_requests_reuse_one_draft (test_agent.AgentAcceptanceTests.test_concurrent_duplicate_requests_reuse_one_draft) ... ok
 test_conflict_proposes_alternative_and_waits_for_approval (test_agent.AgentAcceptanceTests.test_conflict_proposes_alternative_and_waits_for_approval) ... ok
 test_deepseek_adapter_returns_observation_to_model (test_agent.AgentAcceptanceTests.test_deepseek_adapter_returns_observation_to_model) ... ok
 test_deepseek_parallel_reads_are_observed_before_next_model_call (test_agent.AgentAcceptanceTests.test_deepseek_parallel_reads_are_observed_before_next_model_call) ... ok
@@ -5,8 +6,11 @@ test_deepseek_parallel_save_is_rejected_without_write (test_agent.AgentAcceptanc
 test_duplicate_request_creates_only_one_draft (test_agent.AgentAcceptanceTests.test_duplicate_request_creates_only_one_draft) ... ok
 test_exact_user_approval_updates_existing_draft_without_publishing (test_agent.AgentAcceptanceTests.test_exact_user_approval_updates_existing_draft_without_publishing) ... ok
 test_missing_metadata_does_not_save (test_agent.AgentAcceptanceTests.test_missing_metadata_does_not_save) ... ok
+test_missing_real_model_key_points_to_offline_mock (test_agent.AgentAcceptanceTests.test_missing_real_model_key_points_to_offline_mock) ... ok
+test_mock_mode_does_not_read_model_env_file (test_agent.AgentAcceptanceTests.test_mock_mode_does_not_read_model_env_file) ... ok
 test_model_cannot_save_without_observed_review (test_agent.AgentAcceptanceTests.test_model_cannot_save_without_observed_review) ... ok
 test_normal_slot_saves_one_unpublished_draft (test_agent.AgentAcceptanceTests.test_normal_slot_saves_one_unpublished_draft) ... ok
+test_openai_adapter_returns_observation_to_model (test_agent.AgentAcceptanceTests.test_openai_adapter_returns_observation_to_model) ... ok
 test_rule_risk_blocks_save (test_agent.AgentAcceptanceTests.test_rule_risk_blocks_save) ... ok
 test_save_failure_is_explicit_and_not_counted_as_saved (test_agent.AgentAcceptanceTests.test_save_failure_is_explicit_and_not_counted_as_saved) ... ok
 test_step_limit_returns_incomplete (test_agent.AgentAcceptanceTests.test_step_limit_returns_incomplete) ... ok
@@ -15,6 +19,6 @@ test_unavailable_database_returns_structured_failure (test_agent.AgentAcceptance
 test_wrong_approval_does_not_change_hard_time (test_agent.AgentAcceptanceTests.test_wrong_approval_does_not_change_hard_time) ... ok
 
 ----------------------------------------------------------------------
-Ran 15 tests in 0.060s
+Ran 19 tests in 0.132s
 
 OK

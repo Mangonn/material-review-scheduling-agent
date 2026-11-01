@@ -1,4 +1,4 @@
-"""Real Responses API decision maker and an explicitly non-model offline policy."""
+"""Real model adapters and an explicitly non-model offline policy."""
 
 from __future__ import annotations
 
@@ -6,6 +6,10 @@ import json
 import os
 import urllib.error
 import urllib.request
+
+
+class ModelUnavailableError(RuntimeError):
+    """The requested real model mode cannot start without its API key."""
 
 
 def _tool(name: str, description: str, properties: dict, required: list[str]) -> dict:
@@ -86,7 +90,7 @@ class OpenAIModel:
     def __init__(self):
         self.api_key = os.getenv("OPENAI_API_KEY")
         if not self.api_key:
-            raise ValueError("OPENAI_API_KEY is required for --mode openai")
+            raise ModelUnavailableError("OPENAI_API_KEY is required for --mode openai")
         self.model = os.getenv("OPENAI_MODEL", "gpt-6.1-sol")
         self.response_id = None
         self.pending_output = None
@@ -146,7 +150,7 @@ class DeepSeekModel:
     def __init__(self):
         self.api_key = os.getenv("DEEPSEEK_API_KEY")
         if not self.api_key:
-            raise ValueError("DEEPSEEK_API_KEY is required for --mode deepseek")
+            raise ModelUnavailableError("DEEPSEEK_API_KEY is required for --mode deepseek")
         self.model = os.getenv("DEEPSEEK_MODEL", "deepseek-flash")
         self.messages = None
         self.pending_calls = []

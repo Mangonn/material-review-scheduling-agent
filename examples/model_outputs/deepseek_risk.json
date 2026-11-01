@@ -37,7 +37,7 @@
           "revision": 1
         }
       },
-      "decision_basis": "Start by reading source metadata for M03.",
+      "decision_basis": "Inspect source metadata for M03 before review.",
       "model_turn": 1,
       "next_action": "check_rules"
     },
@@ -55,7 +55,7 @@
           "文案命中禁用声明：保证治愈"
         ]
       },
-      "decision_basis": "Check required metadata and review rules for M03.",
+      "decision_basis": "Check required metadata and synthetic rules for M03.",
       "model_turn": 1,
       "next_action": "finish"
     },
@@ -65,7 +65,7 @@
       "action": "finish",
       "arguments": {},
       "observation": "stopped",
-      "decision_basis": "M03 caption contains prohibited claim “保证治愈所有疾病” (guaranteed cure), review status blocked; no slot queried and no draft saved.",
+      "decision_basis": "Rule check blocked M03: caption contains prohibited claim \"保证治愈\"; no save performed.",
       "model_turn": 2,
       "next_action": null
     }
