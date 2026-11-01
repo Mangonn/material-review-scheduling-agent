@@ -8,6 +8,8 @@ from .business import BusinessTools, canonical_key, validate_request
 
 
 def _result(request: dict, evidence: dict, trace: list, mode: str, stop_reason: str | None) -> dict:
+    for index, entry in enumerate(trace):
+        entry["next_action"] = trace[index + 1]["action"] if index + 1 < len(trace) else None
     review = evidence.get("check_rules", {})
     saved = evidence.get("save_draft")
     existing = evidence.get("existing_draft")

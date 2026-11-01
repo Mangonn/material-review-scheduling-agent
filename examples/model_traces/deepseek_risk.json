@@ -18,7 +18,8 @@
       }
     },
     "decision_basis": "Start by reading source metadata for M03.",
-    "model_turn": 1
+    "model_turn": 1,
+    "next_action": "check_rules"
   },
   {
     "step": 2,
@@ -35,7 +36,8 @@
       ]
     },
     "decision_basis": "Check required metadata and review rules for M03.",
-    "model_turn": 1
+    "model_turn": 1,
+    "next_action": "finish"
   },
   {
     "step": 3,
@@ -44,6 +46,7 @@
     "arguments": {},
     "observation": "stopped",
     "decision_basis": "M03 caption contains prohibited claim “保证治愈所有疾病” (guaranteed cure), review status blocked; no slot queried and no draft saved.",
-    "model_turn": 2
+    "model_turn": 2,
+    "next_action": null
   }
 ]

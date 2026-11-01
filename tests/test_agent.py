@@ -57,6 +57,8 @@ class AgentAcceptanceTests(unittest.TestCase):
         self.assertEqual(result["draft"]["status"], "pending_confirmation")
         self.assertTrue(result["pending_confirmation"])
         self.assertEqual([x["action"] for x in result["trace"]].count("query_slot"), 2)
+        self.assertEqual(result["trace"][2]["next_action"], "query_slot")
+        self.assertEqual(result["trace"][3]["next_action"], "save_draft")
 
     def test_duplicate_request_creates_only_one_draft(self):
         first = self.case("conflict")

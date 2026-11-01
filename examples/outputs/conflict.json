@@ -41,7 +41,8 @@
           "revision": 1
         }
       },
-      "decision_basis": "需要先读取素材元数据"
+      "decision_basis": "需要先读取素材元数据",
+      "next_action": "check_rules"
     },
     {
       "step": 2,
@@ -55,7 +56,8 @@
         "missing_fields": [],
         "risks": []
       },
-      "decision_basis": "根据素材检查缺失字段与规则风险"
+      "decision_basis": "根据素材检查缺失字段与规则风险",
+      "next_action": "query_slot"
     },
     {
       "step": 3,
@@ -75,7 +77,8 @@
           "2026-11-04T18:00:00+08:00"
         ]
       },
-      "decision_basis": "先验证用户要求的时段"
+      "decision_basis": "先验证用户要求的时段",
+      "next_action": "query_slot"
     },
     {
       "step": 4,
@@ -94,7 +97,8 @@
           "2026-11-04T18:00:00+08:00"
         ]
       },
-      "decision_basis": "原时段冲突，补查替代时段是否可用"
+      "decision_basis": "原时段冲突，补查替代时段是否可用",
+      "next_action": "save_draft"
     },
     {
       "step": 5,
@@ -114,7 +118,8 @@
           "status": "pending_confirmation"
         }
       },
-      "decision_basis": "审核通过且时段可用，仅保存草稿"
+      "decision_basis": "审核通过且时段可用，仅保存草稿",
+      "next_action": "finish"
     },
     {
       "step": 6,
@@ -122,7 +127,8 @@
       "action": "finish",
       "arguments": {},
       "observation": "stopped",
-      "decision_basis": "已观察草稿保存结果，结束本次处理"
+      "decision_basis": "已观察草稿保存结果，结束本次处理",
+      "next_action": null
     }
   ]
 }

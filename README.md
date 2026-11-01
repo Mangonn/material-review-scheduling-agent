@@ -14,7 +14,7 @@ python3 -m src.cli examples/inputs/conflict.json --db work/review.sqlite3
 python3 -m src.cli examples/inputs/approved_change.json --db work/review.sqlite3
 ```
 
-前三次 CLI 运行依次展示：冲突后建议 19:00 并待确认、重复请求返回同一草稿、用户明确确认后更新草稿时段状态。每次输出均含步骤、参数、工具结果和简短决策依据。`work/review.sqlite3` 是本地状态，可删除后重跑。
+前三次 CLI 运行依次展示：冲突后建议 19:00 并待确认、重复请求返回同一草稿、用户明确确认后更新草稿时段状态。每次输出均含步骤、参数、工具结果、后续动作和简短决策依据。`work/review.sqlite3` 是本地状态，可删除后重跑。
 
 ## 其他验收命令
 

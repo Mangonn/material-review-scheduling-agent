@@ -40,7 +40,8 @@
           "status": "pending_confirmation"
         }
       },
-      "decision_basis": "相同请求已保存，直接返回原草稿"
+      "decision_basis": "相同请求已保存，直接返回原草稿",
+      "next_action": null
     }
   ]
 }

@@ -9,7 +9,8 @@
     "observation": {
       "status": "confirmed_time"
     },
-    "decision_basis": "仅接受与已有建议时段完全相同的用户确认"
+    "decision_basis": "仅接受与已有建议时段完全相同的用户确认",
+    "next_action": "idempotency_lookup"
   },
   {
     "step": 0,
@@ -28,6 +29,7 @@
         "status": "confirmed_time"
       }
     },
-    "decision_basis": "相同请求已保存，直接返回原草稿"
+    "decision_basis": "相同请求已保存，直接返回原草稿",
+    "next_action": null
   }
 ]
