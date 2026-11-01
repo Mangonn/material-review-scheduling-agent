@@ -1,0 +1,21 @@
+[
+  {
+    "step": 0,
+    "actor": "system",
+    "action": "idempotency_lookup",
+    "arguments": {
+      "request_key": "445b9b66e53566f66069e3ff1249d029c6e26ab3089e421ad36fec62a11c9177"
+    },
+    "observation": {
+      "found": true,
+      "draft": {
+        "request_key": "445b9b66e53566f66069e3ff1249d029c6e26ab3089e421ad36fec62a11c9177",
+        "material_id": "M01",
+        "requested_slot": "2026-11-03T18:00:00+08:00",
+        "proposed_slot": "2026-11-03T19:00:00+08:00",
+        "status": "pending_confirmation"
+      }
+    },
+    "decision_basis": "相同请求已保存，直接返回原草稿"
+  }
+]

@@ -1,0 +1,66 @@
+{
+  "material_id": "M02",
+  "requested_slot": "2026-11-04T18:00:00+08:00",
+  "requirement": "hard",
+  "review_status": "needs_information",
+  "risk_reasons": [],
+  "missing_fields": [
+    "license"
+  ],
+  "suggested_slot": null,
+  "pending_confirmation": [
+    "补齐素材字段：license"
+  ],
+  "draft_status": "not_attempted",
+  "draft": null,
+  "save_error": null,
+  "completion_status": "needs_input",
+  "stop_reason": null,
+  "mode": "mock_policy",
+  "published": false,
+  "trace": [
+    {
+      "step": 1,
+      "actor": "mock_policy",
+      "action": "read_material",
+      "arguments": {
+        "material_id": "M02"
+      },
+      "observation": {
+        "found": true,
+        "material_id": "M02",
+        "material": {
+          "title": "街头采访",
+          "rights": "third_party",
+          "caption": "采访片段",
+          "revision": 1
+        }
+      },
+      "decision_basis": "需要先读取素材元数据"
+    },
+    {
+      "step": 2,
+      "actor": "mock_policy",
+      "action": "check_rules",
+      "arguments": {
+        "material_id": "M02"
+      },
+      "observation": {
+        "status": "needs_information",
+        "missing_fields": [
+          "license"
+        ],
+        "risks": []
+      },
+      "decision_basis": "根据素材检查缺失字段与规则风险"
+    },
+    {
+      "step": 3,
+      "actor": "mock_policy",
+      "action": "finish",
+      "arguments": {},
+      "observation": "stopped",
+      "decision_basis": "审核未通过或资料不足，不能保存草稿"
+    }
+  ]
+}

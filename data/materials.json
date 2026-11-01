@@ -1,0 +1,6 @@
+{
+  "M01": {"title": "秋日短片", "rights": "owned", "license": "internal", "caption": "记录城市秋色", "revision": 1},
+  "M02": {"title": "街头采访", "rights": "third_party", "caption": "采访片段", "revision": 1},
+  "M03": {"title": "神奇饮品", "rights": "owned", "license": "internal", "caption": "饮用后保证治愈所有疾病", "revision": 1},
+  "M04": {"title": "产品开箱", "rights": "owned", "license": "internal", "caption": "展示包装与配件", "revision": 1}
+}

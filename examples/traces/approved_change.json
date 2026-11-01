@@ -1,0 +1,33 @@
+[
+  {
+    "step": 0,
+    "actor": "system",
+    "action": "apply_user_confirmation",
+    "arguments": {
+      "approved_alternative_slot": "2026-11-03T19:00:00+08:00"
+    },
+    "observation": {
+      "status": "confirmed_time"
+    },
+    "decision_basis": "仅接受与已有建议时段完全相同的用户确认"
+  },
+  {
+    "step": 0,
+    "actor": "system",
+    "action": "idempotency_lookup",
+    "arguments": {
+      "request_key": "445b9b66e53566f66069e3ff1249d029c6e26ab3089e421ad36fec62a11c9177"
+    },
+    "observation": {
+      "found": true,
+      "draft": {
+        "request_key": "445b9b66e53566f66069e3ff1249d029c6e26ab3089e421ad36fec62a11c9177",
+        "material_id": "M01",
+        "requested_slot": "2026-11-03T18:00:00+08:00",
+        "proposed_slot": "2026-11-03T19:00:00+08:00",
+        "status": "confirmed_time"
+      }
+    },
+    "decision_basis": "相同请求已保存，直接返回原草稿"
+  }
+]

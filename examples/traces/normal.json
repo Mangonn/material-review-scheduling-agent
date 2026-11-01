@@ -1,0 +1,83 @@
+[
+  {
+    "step": 1,
+    "actor": "mock_policy",
+    "action": "read_material",
+    "arguments": {
+      "material_id": "M04"
+    },
+    "observation": {
+      "found": true,
+      "material_id": "M04",
+      "material": {
+        "title": "产品开箱",
+        "rights": "owned",
+        "license": "internal",
+        "caption": "展示包装与配件",
+        "revision": 1
+      }
+    },
+    "decision_basis": "需要先读取素材元数据"
+  },
+  {
+    "step": 2,
+    "actor": "mock_policy",
+    "action": "check_rules",
+    "arguments": {
+      "material_id": "M04"
+    },
+    "observation": {
+      "status": "approved",
+      "missing_fields": [],
+      "risks": []
+    },
+    "decision_basis": "根据素材检查缺失字段与规则风险"
+  },
+  {
+    "step": 3,
+    "actor": "mock_policy",
+    "action": "query_slot",
+    "arguments": {
+      "slot": "2026-11-04T18:00:00+08:00"
+    },
+    "observation": {
+      "slot": "2026-11-04T18:00:00+08:00",
+      "available": true,
+      "reason": "free",
+      "occupied_by": null,
+      "alternatives": [
+        "2026-11-03T19:00:00+08:00",
+        "2026-11-03T20:00:00+08:00"
+      ]
+    },
+    "decision_basis": "先验证用户要求的时段"
+  },
+  {
+    "step": 4,
+    "actor": "mock_policy",
+    "action": "save_draft",
+    "arguments": {
+      "slot": "2026-11-04T18:00:00+08:00"
+    },
+    "observation": {
+      "saved": true,
+      "duplicate": false,
+      "draft": {
+        "request_key": "3623df5d80514df815508a98271c9111aad611a93efa3d3e9f9bd71da1fbcafc",
+        "material_id": "M04",
+        "requested_slot": "2026-11-04T18:00:00+08:00",
+        "proposed_slot": "2026-11-04T18:00:00+08:00",
+        "status": "ready_for_confirmation"
+      }
+    },
+    "decision_basis": "审核通过且时段可用，仅保存草稿"
+  },
+  {
+    "step": 5,
+    "actor": "mock_policy",
+    "action": "finish",
+    "arguments": {},
+    "observation": "stopped",
+    "decision_basis": "已观察草稿保存结果，结束本次处理"
+  }
+]

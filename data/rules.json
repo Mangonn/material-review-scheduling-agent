@@ -1,0 +1,6 @@
+{
+  "required_fields": ["title", "rights", "license", "caption"],
+  "allowed_rights": ["owned", "third_party"],
+  "prohibited_claims": ["保证治愈", "绝对安全"],
+  "note": "合成规则仅用于考核演示，不代表真实平台审核政策。"
+}

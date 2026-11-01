@@ -1,0 +1,67 @@
+{
+  "material_id": "M03",
+  "requested_slot": "2026-11-04T18:00:00+08:00",
+  "requirement": "hard",
+  "review_status": "blocked",
+  "risk_reasons": [
+    "文案命中禁用声明：保证治愈"
+  ],
+  "missing_fields": [],
+  "suggested_slot": null,
+  "pending_confirmation": [
+    "处理审核风险后重新提交"
+  ],
+  "draft_status": "not_attempted",
+  "draft": null,
+  "save_error": null,
+  "completion_status": "blocked",
+  "stop_reason": null,
+  "mode": "mock_policy",
+  "published": false,
+  "trace": [
+    {
+      "step": 1,
+      "actor": "mock_policy",
+      "action": "read_material",
+      "arguments": {
+        "material_id": "M03"
+      },
+      "observation": {
+        "found": true,
+        "material_id": "M03",
+        "material": {
+          "title": "神奇饮品",
+          "rights": "owned",
+          "license": "internal",
+          "caption": "饮用后保证治愈所有疾病",
+          "revision": 1
+        }
+      },
+      "decision_basis": "需要先读取素材元数据"
+    },
+    {
+      "step": 2,
+      "actor": "mock_policy",
+      "action": "check_rules",
+      "arguments": {
+        "material_id": "M03"
+      },
+      "observation": {
+        "status": "blocked",
+        "missing_fields": [],
+        "risks": [
+          "文案命中禁用声明：保证治愈"
+        ]
+      },
+      "decision_basis": "根据素材检查缺失字段与规则风险"
+    },
+    {
+      "step": 3,
+      "actor": "mock_policy",
+      "action": "finish",
+      "arguments": {},
+      "observation": "stopped",
+      "decision_basis": "审核未通过或资料不足，不能保存草稿"
+    }
+  ]
+}
