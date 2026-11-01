@@ -40,6 +40,8 @@ python3 -m src.cli examples/inputs/conflict.json --mode deepseek --db work/deeps
 
 准备提交真实模型验收记录时运行 `python3 examples/run_model_examples.py --mode deepseek`；它用独立数据库执行冲突和规则风险两条路径，并在 `examples/model_outputs/` 与 `examples/model_traces/` 保存实际结果。
 
+本次已保存两条真实 DeepSeek 运行记录：[冲突输出](examples/model_outputs/deepseek_conflict.json)、[冲突 Trace](examples/model_traces/deepseek_conflict.json)、[风险输出](examples/model_outputs/deepseek_risk.json)、[风险 Trace](examples/model_traces/deepseek_risk.json)。本机 Python 如报证书链错误，可在 macOS 上先执行 `export SSL_CERT_FILE=/etc/ssl/cert.pem`。
+
 OpenAI：
 
 ```bash
@@ -48,7 +50,7 @@ export OPENAI_MODEL='gpt-6.1-sol'
 python3 -m src.cli examples/inputs/conflict.json --mode openai --db work/model.sqlite3
 ```
 
-真实模式每一步均由模型从 `read_material`、`check_rules`、`query_slot`、`save_draft`、`finish` 中选择，工具输出再送回模型。OpenAI 模式使用 Responses API，结构参考 [OpenAI 官方函数调用文档](https://developers.openai.com/api/docs/guides/function-calling)。`--mode mock` 是默认的确定性离线策略，只验证流程、工具和防护；截至当前文档版本，**尚未产生真实模型运行记录或真实模型效果结论**。
+真实模式每一步均由模型从 `read_material`、`check_rules`、`query_slot`、`save_draft`、`finish` 中选择，工具输出再送回模型。OpenAI 模式使用 Responses API，结构参考 [OpenAI 官方函数调用文档](https://developers.openai.com/api/docs/guides/function-calling)。`--mode mock` 是默认的确定性离线策略，只验证流程、工具和防护；两条 DeepSeek 真实运行记录证明了本次样例的模型观察与后续动作，但不代表所有输入上的效果。
 
 ## 输入和结果
 
@@ -64,4 +66,4 @@ python3 -m src.cli examples/inputs/conflict.json --mode openai --db work/model.s
 - [AI 使用记录](docs/04-ai-usage.md)
 - [复盘](docs/05-retrospective.md)
 
-本地项目可运行；GitHub URL 与远端 commit SHA 需在获得仓库写入权限并推送后填写，不能以本地提交代替远端交付。
+公开仓库：[Mangonn/material-review-scheduling-agent](https://github.com/Mangonn/material-review-scheduling-agent)。最终 commit SHA 以 GitHub `main` 分支为准。

@@ -90,6 +90,7 @@ class OpenAIModel:
         self.model = os.getenv("OPENAI_MODEL", "gpt-6.1-sol")
         self.response_id = None
         self.pending_output = None
+        self.turn = 0
 
     def decide(self, request: dict, evidence: dict) -> dict:
         payload = {
@@ -114,13 +115,15 @@ class OpenAIModel:
         except (urllib.error.URLError, TimeoutError) as exc:
             raise RuntimeError(f"model_transport_error:{type(exc).__name__}") from exc
         self.response_id = data["id"]
+        self.turn += 1
         calls = [item for item in data.get("output", []) if item.get("type") == "function_call"]
         if len(calls) > 1:
             raise RuntimeError("model_returned_parallel_calls")
         if not calls:
             text = " ".join(part.get("text", "") for item in data.get("output", [])
                             for part in item.get("content", []) if part.get("type") == "output_text")
-            return {"name": "finish", "arguments": {}, "reason": text[:200] or "模型结束"}
+            return {"name": "finish", "arguments": {}, "reason": text[:200] or "模型结束",
+                    "model_turn": self.turn}
         call = calls[0]
         self.call_id = call["call_id"]
         try:
@@ -128,7 +131,7 @@ class OpenAIModel:
         except json.JSONDecodeError as exc:
             raise RuntimeError("invalid_model_tool_arguments") from exc
         return {"name": call["name"], "arguments": args,
-                "reason": str(args.get("reason", "模型选择此动作"))[:200]}
+                "reason": str(args.get("reason", "模型选择此动作"))[:200], "model_turn": self.turn}
 
     def observe(self, result: dict) -> None:
         self.pending_output = {"type": "function_call_output", "call_id": self.call_id,
@@ -146,8 +149,23 @@ class DeepSeekModel:
             raise ValueError("DEEPSEEK_API_KEY is required for --mode deepseek")
         self.model = os.getenv("DEEPSEEK_MODEL", "deepseek-flash")
         self.messages = None
+        self.pending_calls = []
+        self.rejected_call_ids = []
+        self.turn = 0
+
+    def _next_call(self) -> dict:
+        call = self.pending_calls.pop(0)
+        self.call_id = call["id"]
+        try:
+            args = json.loads(call["function"]["arguments"])
+        except json.JSONDecodeError as exc:
+            raise RuntimeError("invalid_model_tool_arguments") from exc
+        return {"name": call["function"]["name"], "arguments": args,
+                "reason": str(args.get("reason", "模型选择此动作"))[:200], "model_turn": self.turn}
 
     def decide(self, request: dict, evidence: dict) -> dict:
+        if self.pending_calls:
+            return self._next_call()
         if self.messages is None:
             self.messages = [
                 {"role": "system", "content": INSTRUCTIONS},
@@ -173,20 +191,28 @@ class DeepSeekModel:
         except (urllib.error.URLError, TimeoutError) as exc:
             raise RuntimeError(f"model_transport_error:{type(exc).__name__}") from exc
         choice = data["choices"][0]
+        self.turn += 1
         message = choice["message"]
         calls = message.get("tool_calls") or []
-        if len(calls) != 1:
-            raise RuntimeError(f"expected_one_model_tool_call_got_{len(calls)}")
-        call = calls[0]
-        self.call_id = call["id"]
+        if not calls:
+            raise RuntimeError("model_returned_no_tool_call")
         self.messages.append({"role": "assistant", "content": message.get("content"), "tool_calls": calls})
-        try:
-            args = json.loads(call["function"]["arguments"])
-        except json.JSONDecodeError as exc:
-            raise RuntimeError("invalid_model_tool_arguments") from exc
-        return {"name": call["function"]["name"], "arguments": args,
-                "reason": str(args.get("reason", "模型选择此动作"))[:200]}
+        if len(calls) > 1 and any(
+            call["function"]["name"] not in ("read_material", "check_rules", "query_slot")
+            for call in calls
+        ):
+            self.rejected_call_ids = [call["id"] for call in calls]
+            return {"name": "parallel_side_effects_rejected", "arguments": {},
+                    "reason": "模型并行请求包含写入或结束动作，要求单独重选", "model_turn": self.turn}
+        self.pending_calls = list(calls)
+        return self._next_call()
 
     def observe(self, result: dict) -> None:
+        if self.rejected_call_ids:
+            for call_id in self.rejected_call_ids:
+                self.messages.append({"role": "tool", "tool_call_id": call_id,
+                                      "content": json.dumps({"error": "parallel_side_effects_rejected"})})
+            self.rejected_call_ids = []
+            return
         self.messages.append({"role": "tool", "tool_call_id": self.call_id,
                               "content": json.dumps(result, ensure_ascii=False)})

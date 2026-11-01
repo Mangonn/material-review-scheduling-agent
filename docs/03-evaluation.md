@@ -1,6 +1,6 @@
 # 03 评估结果与限制
 
-2026-11-01 在 Python 3.14.3 执行 `python3 -m unittest discover -s tests -v`：**12 项通过**，原始记录见 [test-results.txt](../examples/test-results.txt)。示例由真实 CLI 调用生成，命令为 `python3 examples/run_examples.py`；输出和独立 Trace 均保存在 `examples/`。所有示例模式均为 `mock_policy`。
+2026-11-01 在 Python 3.14.3 执行 `python3 -m unittest discover -s tests -v`：**14 项通过**，原始记录见 [test-results.txt](../examples/test-results.txt)。下表离线示例由真实 CLI 调用生成，命令为 `python3 examples/run_examples.py`；输出和独立 Trace 均保存在 `examples/`，模式为 `mock_policy`。
 
 | 验收点 | 输入 | 实际输出 | Trace | 实际结果 |
 | --- | --- | --- | --- | --- |
@@ -14,9 +14,22 @@
 
 `test_step_limit_returns_incomplete` 与 `test_tool_limit_returns_incomplete` 验证超限返回明确未完成；`test_model_cannot_save_without_observed_review` 验证模型越过审核直接保存时被工具拒绝。
 
+## 真实模型决策记录
+
+2026-11-01 使用 `deepseek-flash` 的非思考模式运行 `python3 examples/run_model_examples.py --mode deepseek`，工具函数由模型实际选择。本次样例使用独立数据库，未使用真实业务数据。
+
+| 路径 | 输入 | 实际输出 | Trace | 工具观察后的后续动作 |
+| --- | --- | --- | --- | --- |
+| 冲突调整 | [conflict](../examples/inputs/conflict.json) | [deepseek_conflict](../examples/model_outputs/deepseek_conflict.json) | [deepseek_conflict](../examples/model_traces/deepseek_conflict.json) | 18:00 返回占用后选 `query_slot(19:00)`；空闲后选 `save_draft(19:00)`，结果为 `pending_confirmation`，6 步 |
+| 规则阻断 | [risk](../examples/inputs/risk.json) | [deepseek_risk](../examples/model_outputs/deepseek_risk.json) | [deepseek_risk](../examples/model_traces/deepseek_risk.json) | `check_rules` 返回风险后选 `finish`，无排期查询或保存，3 步 |
+
+`model_turn` 表示一次模型响应。风险用例中读取素材与规则检查来自同一模型响应的两个只读调用；模型收到两项结果后才决定结束。冲突用例每步均为独立模型响应。
+
+首次 API 调试遇到本机 Python 证书链错误；指定系统证书后，发现 DeepSeek 可在一次响应中给出多个只读工具请求。适配器现支持逐个执行只读调用并汇总回传，涉及写入的并行请求会被拒绝。上述两条为修复后的实际结果。
+
 ## 失败与已知限制
 
-- 当前环境尚未配置模型 API 密钥，真实模型路径**未运行、未验证模型选择动作的实际效果**。至少两条不同的离线 Trace 可证明工具观察后流程改变，不能替代考核要求的真实模型决策记录。获得凭证后应在 `--mode deepseek` 或 `--mode openai` 下重跑冲突与风险两条路径并提交其 Trace。
+- 真实模型仅验证了冲突与规则风险两条路径；其余验收点使用离线策略与工具测试验证。OpenAI 模式已实现但本次未实测。两条样例不能推断真实模型在所有素材上的准确率。
 - 合成规则仅是演示，无法替代真实内容、版权、平台政策审核。没有线上排期系统与发布接口。
 - 用字符串匹配候选时段，要求输入采用 `data/schedule.json` 的时区格式；没有跨时区归一化或复杂时间窗优化。
 - 数据库的唯一请求键不包含素材修订号。素材更新后同一请求可能返回旧草稿，生产实现需带版本并触发复审。

@@ -1,0 +1,134 @@
+{
+  "material_id": "M01",
+  "requested_slot": "2026-11-03T18:00:00+08:00",
+  "requirement": "hard",
+  "review_status": "approved",
+  "risk_reasons": [],
+  "missing_fields": [],
+  "suggested_slot": "2026-11-03T19:00:00+08:00",
+  "pending_confirmation": [
+    "确认将硬性时段 2026-11-03T18:00:00+08:00 改为 2026-11-03T19:00:00+08:00"
+  ],
+  "draft_status": "saved",
+  "draft": {
+    "request_key": "445b9b66e53566f66069e3ff1249d029c6e26ab3089e421ad36fec62a11c9177",
+    "material_id": "M01",
+    "requested_slot": "2026-11-03T18:00:00+08:00",
+    "proposed_slot": "2026-11-03T19:00:00+08:00",
+    "status": "pending_confirmation"
+  },
+  "save_error": null,
+  "completion_status": "pending_confirmation",
+  "stop_reason": null,
+  "mode": "deepseek_chat",
+  "published": false,
+  "trace": [
+    {
+      "step": 1,
+      "actor": "deepseek_chat",
+      "action": "read_material",
+      "arguments": {
+        "material_id": "M01"
+      },
+      "observation": {
+        "found": true,
+        "material_id": "M01",
+        "material": {
+          "title": "秋日短片",
+          "rights": "owned",
+          "license": "internal",
+          "caption": "记录城市秋色",
+          "revision": 1
+        }
+      },
+      "decision_basis": "Start review of M01 metadata before slot checks.",
+      "model_turn": 1
+    },
+    {
+      "step": 2,
+      "actor": "deepseek_chat",
+      "action": "check_rules",
+      "arguments": {
+        "material_id": "M01"
+      },
+      "observation": {
+        "status": "approved",
+        "missing_fields": [],
+        "risks": []
+      },
+      "decision_basis": "Verify required metadata and review rules for M01.",
+      "model_turn": 2
+    },
+    {
+      "step": 3,
+      "actor": "deepseek_chat",
+      "action": "query_slot",
+      "arguments": {
+        "slot": "2026-11-03T18:00:00+08:00"
+      },
+      "observation": {
+        "slot": "2026-11-03T18:00:00+08:00",
+        "available": false,
+        "reason": "occupied",
+        "occupied_by": "EXISTING-01",
+        "alternatives": [
+          "2026-11-03T19:00:00+08:00",
+          "2026-11-03T20:00:00+08:00",
+          "2026-11-04T18:00:00+08:00"
+        ]
+      },
+      "decision_basis": "Check the hard requested slot for M01.",
+      "model_turn": 3
+    },
+    {
+      "step": 4,
+      "actor": "deepseek_chat",
+      "action": "query_slot",
+      "arguments": {
+        "slot": "2026-11-03T19:00:00+08:00"
+      },
+      "observation": {
+        "slot": "2026-11-03T19:00:00+08:00",
+        "available": true,
+        "reason": "free",
+        "occupied_by": null,
+        "alternatives": [
+          "2026-11-03T20:00:00+08:00",
+          "2026-11-04T18:00:00+08:00"
+        ]
+      },
+      "decision_basis": "Check alternative slot 19:00 since requested slot is occupied.",
+      "model_turn": 4
+    },
+    {
+      "step": 5,
+      "actor": "deepseek_chat",
+      "action": "save_draft",
+      "arguments": {
+        "slot": "2026-11-03T19:00:00+08:00"
+      },
+      "observation": {
+        "saved": true,
+        "duplicate": false,
+        "draft": {
+          "request_key": "445b9b66e53566f66069e3ff1249d029c6e26ab3089e421ad36fec62a11c9177",
+          "material_id": "M01",
+          "requested_slot": "2026-11-03T18:00:00+08:00",
+          "proposed_slot": "2026-11-03T19:00:00+08:00",
+          "status": "pending_confirmation"
+        }
+      },
+      "decision_basis": "Rules approved, no missing fields; requested slot occupied, alternative 19:00 verified free. Saving proposal as pending confirmation only.",
+      "model_turn": 5
+    },
+    {
+      "step": 6,
+      "actor": "deepseek_chat",
+      "action": "finish",
+      "arguments": {},
+      "observation": "stopped",
+      "decision_basis": "M01 metadata complete and rules approved (no risks). Hard requested slot 2026-11-03T18:00 occupied by EXISTING-01; alternative 19:00 verified free and saved as pending_confirmation proposal. No approv",
+      "model_turn": 6
+    }
+  ]
+}

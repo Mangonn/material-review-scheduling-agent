@@ -149,6 +149,47 @@ class AgentAcceptanceTests(unittest.TestCase):
         self.assertEqual(payloads[1]["tool_choice"], "required")
         self.assertEqual(payloads[1]["thinking"], {"type": "disabled"})
 
+    def test_deepseek_parallel_reads_are_observed_before_next_model_call(self):
+        responses = [
+            {"choices": [{"message": {"role": "assistant", "content": None, "tool_calls": [
+                {"id": "one", "type": "function", "function": {"name": "read_material", "arguments": '{"material_id":"M01","reason":"read"}'}},
+                {"id": "two", "type": "function", "function": {"name": "check_rules", "arguments": '{"material_id":"M01","reason":"check"}'}}
+            ]}}]},
+            {"choices": [{"message": {"role": "assistant", "content": None, "tool_calls": [
+                {"id": "three", "type": "function", "function": {"name": "finish", "arguments": '{"reason":"done"}'}}
+            ]}}]},
+        ]
+        payloads = []
+
+        def fake_urlopen(http_request, timeout):
+            payloads.append(json.loads(http_request.data))
+            return io.BytesIO(json.dumps(responses[len(payloads) - 1]).encode())
+
+        with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "test-only"}), patch("urllib.request.urlopen", side_effect=fake_urlopen):
+            model = DeepSeekModel()
+            self.assertEqual(model.decide({"material_id": "M01"}, {})["name"], "read_material")
+            model.observe({"found": True})
+            self.assertEqual(model.decide({"material_id": "M01"}, {})["name"], "check_rules")
+            model.observe({"status": "approved"})
+            self.assertEqual(model.decide({"material_id": "M01"}, {})["name"], "finish")
+        self.assertEqual(len(payloads), 2)
+        self.assertEqual([m["role"] for m in payloads[1]["messages"][-2:]], ["tool", "tool"])
+
+    def test_deepseek_parallel_save_is_rejected_without_write(self):
+        response = {"choices": [{"message": {"role": "assistant", "content": None, "tool_calls": [
+            {"id": "one", "type": "function", "function": {"name": "read_material", "arguments": '{"material_id":"M04","reason":"read"}'}},
+            {"id": "two", "type": "function", "function": {"name": "save_draft", "arguments": '{"slot":"2026-11-04T18:00:00+08:00","reason":"save"}'}}
+        ]}}]}
+        with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "test-only"}), patch(
+            "urllib.request.urlopen", return_value=io.BytesIO(json.dumps(response).encode())
+        ):
+            model = DeepSeekModel()
+            request = json.loads((ROOT / "examples/inputs/normal.json").read_text())
+            result = run(request, model=model, db_path=self.db, max_steps=1)
+        self.assertEqual(result["trace"][0]["action"], "parallel_side_effects_rejected")
+        self.assertEqual(result["completion_status"], "incomplete")
+        self.assertEqual(self.count(), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

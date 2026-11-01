@@ -91,8 +91,11 @@ def run(request: dict, *, model, db_path: Path, fail_save: bool = False,
             if not isinstance(args, dict):
                 return _result(request, evidence, trace, model.name, "invalid_model_arguments")
             if name == "finish":
-                trace.append({"step": step, "actor": model.name, "action": "finish",
-                              "arguments": {}, "observation": "stopped", "decision_basis": reason})
+                entry = {"step": step, "actor": model.name, "action": "finish",
+                         "arguments": {}, "observation": "stopped", "decision_basis": reason}
+                if "model_turn" in decision:
+                    entry["model_turn"] = decision["model_turn"]
+                trace.append(entry)
                 return _result(request, evidence, trace, model.name, None)
             if tool_count >= max_tools:
                 trace.append({"step": step, "actor": "system", "action": "tool_limit",
@@ -119,9 +122,12 @@ def run(request: dict, *, model, db_path: Path, fail_save: bool = False,
                     evidence["proposed_slot"] = args["slot"]
             else:
                 observation = {"error": "unknown_tool_or_invalid_arguments"}
-            trace.append({"step": step, "actor": model.name, "action": name,
-                          "arguments": {k: v for k, v in args.items() if k != "reason"},
-                          "observation": observation, "decision_basis": reason})
+            entry = {"step": step, "actor": model.name, "action": name,
+                     "arguments": {k: v for k, v in args.items() if k != "reason"},
+                     "observation": observation, "decision_basis": reason}
+            if "model_turn" in decision:
+                entry["model_turn"] = decision["model_turn"]
+            trace.append(entry)
             model.observe(observation)
         return _result(request, evidence, trace, model.name, "step_limit")
     finally:

@@ -91,7 +91,7 @@ class BusinessTools:
         for claim in self.rules["prohibited_claims"]:
             if claim in item.get("caption", ""):
                 risks.append(f"文案命中禁用声明：{claim}")
-        status = "needs_information" if missing else "blocked" if risks else "approved"
+        status = "blocked" if risks else "needs_information" if missing else "approved"
         return {"status": status, "missing_fields": missing, "risks": risks}
 
     def query_slot(self, slot: str) -> dict:
