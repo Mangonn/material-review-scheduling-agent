@@ -1,0 +1,109 @@
+[
+  {
+    "step": 1,
+    "actor": "mock_policy",
+    "action": "read_material",
+    "arguments": {
+      "material_id": "M01"
+    },
+    "observation": {
+      "found": true,
+      "material_id": "M01",
+      "material": {
+        "title": "秋日短片",
+        "rights": "owned",
+        "license": "internal",
+        "caption": "记录城市秋色",
+        "revision": 1
+      }
+    },
+    "decision_basis": "需要先读取素材元数据",
+    "next_action": "check_rules"
+  },
+  {
+    "step": 2,
+    "actor": "mock_policy",
+    "action": "check_rules",
+    "arguments": {
+      "material_id": "M01"
+    },
+    "observation": {
+      "status": "approved",
+      "missing_fields": [],
+      "risks": []
+    },
+    "decision_basis": "根据素材检查缺失字段与规则风险",
+    "next_action": "query_slot"
+  },
+  {
+    "step": 3,
+    "actor": "mock_policy",
+    "action": "query_slot",
+    "arguments": {
+      "slot": "2026-11-03T18:00:00+08:00"
+    },
+    "observation": {
+      "slot": "2026-11-03T18:00:00+08:00",
+      "available": false,
+      "reason": "occupied",
+      "occupied_by": "EXISTING-01",
+      "alternatives": [
+        "2026-11-03T19:00:00+08:00",
+        "2026-11-03T20:00:00+08:00",
+        "2026-11-04T18:00:00+08:00"
+      ]
+    },
+    "decision_basis": "先验证用户要求的时段",
+    "next_action": "query_slot"
+  },
+  {
+    "step": 4,
+    "actor": "mock_policy",
+    "action": "query_slot",
+    "arguments": {
+      "slot": "2026-11-03T19:00:00+08:00"
+    },
+    "observation": {
+      "slot": "2026-11-03T19:00:00+08:00",
+      "available": true,
+      "reason": "free",
+      "occupied_by": null,
+      "alternatives": [
+        "2026-11-03T20:00:00+08:00",
+        "2026-11-04T18:00:00+08:00"
+      ]
+    },
+    "decision_basis": "原时段冲突，补查替代时段是否可用",
+    "next_action": "save_draft"
+  },
+  {
+    "step": 5,
+    "actor": "mock_policy",
+    "action": "save_draft",
+    "arguments": {
+      "slot": "2026-11-03T19:00:00+08:00"
+    },
+    "observation": {
+      "saved": true,
+      "duplicate": false,
+      "draft": {
+        "request_key": "34ff035d141c6bc81fa719b8fb7411f6e25ce82a0f2dad6e3fe8a0fd81ea772e",
+        "material_id": "M01",
+        "requested_slot": "2026-11-03T18:00:00+08:00",
+        "proposed_slot": "2026-11-03T19:00:00+08:00",
+        "status": "ready_for_confirmation"
+      }
+    },
+    "decision_basis": "审核通过且时段可用，仅保存草稿",
+    "next_action": "finish"
+  },
+  {
+    "step": 6,
+    "actor": "mock_policy",
+    "action": "finish",
+    "arguments": {},
+    "observation": "stopped",
+    "decision_basis": "已观察草稿保存结果，结束本次处理",
+    "next_action": null
+  }
+]

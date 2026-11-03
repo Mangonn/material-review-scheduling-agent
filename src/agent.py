@@ -23,6 +23,8 @@ def _result(request: dict, evidence: dict, trace: list, mode: str, stop_reason: 
     if proposed and request["requirement"] == "hard" and proposed != request["requested_slot"]:
         if request.get("approved_alternative_slot") != proposed and (not draft or draft["status"] == "pending_confirmation"):
             pending.append(f"确认将硬性时段 {request['requested_slot']} 改为 {proposed}")
+    if proposed and request["requirement"] == "soft" and proposed != request["requested_slot"]:
+        pending.append(f"软性时段已由 {request['requested_slot']} 调整建议为 {proposed}，请确认草稿时段")
     if existing:
         draft_status = "already_exists"
     elif saved and saved.get("saved"):

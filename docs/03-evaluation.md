@@ -1,6 +1,6 @@
 # 03 评估结果与限制
 
-2026-11-01 在 Python 3.14.3 初测，并于 Python 3.12.10 复查 `python3 -m unittest discover -s tests -v`：**19 项通过**，原始记录见 [test-results.txt](../examples/test-results.txt)。下表离线示例由真实 CLI 调用生成，命令为 `python3 examples/run_examples.py`；输出和独立 Trace 均保存在 `examples/`，模式为 `mock_policy`。另在无 `.env` 的干净复制目录按 README 命令复现：测试通过，冲突、重复、确认、保存失败及缺少真实模型密钥时的状态均符合预期。
+2026-11-01 在 Python 3.14.3 初测，并于 Python 3.12.10 复查 `python3 -m unittest discover -s tests -v`：**20 项通过（2026-11-03 复核；首次为 19 项）**，原始记录见 [test-results.txt](../examples/test-results.txt)。下表离线示例由真实 CLI 调用生成，命令为 `python3 examples/run_examples.py`；输出和独立 Trace 均保存在 `examples/`，模式为 `mock_policy`。另在无 `.env` 的干净复制目录按 README 命令复现：测试通过，冲突、重复、确认、保存失败及缺少真实模型密钥时的状态均符合预期。
 
 | 验收点 | 输入 | 实际输出 | Trace | 实际结果 |
 | --- | --- | --- | --- | --- |
@@ -29,8 +29,15 @@
 
 ## 失败与已知限制
 
-- 真实模型仅验证了冲突与规则风险两条路径；其余验收点使用离线策略与工具测试验证。OpenAI 模式的工具结果回传已用伪响应做适配测试，但本次未调用其真实 API。两条样例不能推断真实模型在所有素材上的准确率。
+- 首次真实模型验证了冲突与规则风险两条路径；2026-11-03 增补保存失败路径；其余验收点使用离线策略与工具测试验证。OpenAI 模式的工具结果回传已用伪响应做适配测试，但本次未调用其真实 API。两条样例不能推断真实模型在所有素材上的准确率。
 - 合成规则仅是演示，无法替代真实内容、版权、平台政策审核。没有线上排期系统与发布接口。
 - 用字符串匹配候选时段，要求输入采用 `data/schedule.json` 的时区格式；没有跨时区归一化或复杂时间窗优化。
 - 数据库的唯一请求键不包含素材修订号。素材更新后同一请求可能返回旧草稿，生产实现需带版本并触发复审。
 - SQLite 适合本地演示；跨进程高并发调度需共享事务存储和更强的锁策略。
+
+
+## 2026-11-03 评审反馈后的复核
+
+- 修复测试里的 SQLite 连接未关闭问题；并发测试改为在两条查询均观察到空闲后同步，再同时进入保存流程，避免把屏障放在事务锁内。20 项测试通过；并发用例连续独立运行 5 次均通过。本机为 macOS，Windows 评审环境尚未复跑，跨平台结论仍待 Windows 验证。
+- 增加[软性冲突输入](../examples/inputs/soft_conflict.json)、[实际输出](../examples/outputs/soft_conflict.json)和[Trace](../examples/traces/soft_conflict.json)：19:00 草稿保留 `draft_ready`，`pending_confirmation` 明确提示由 18:00 调整，`published=false`。离线示例现为 8 组。
+- 增加真实模型[保存失败输出](../examples/model_outputs/deepseek_save_failure.json)与[Trace](../examples/model_traces/deepseek_save_failure.json)：尝试保存后观察到 `simulated_storage_failure`，最终 `failed`、无草稿、未发布。真实模型成功记录现为 3 条。复跑冲突用例另有一次得到 `incomplete`，说明模型结果有波动；该失败没有覆盖之前的成功 Trace。

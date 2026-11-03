@@ -7,3 +7,5 @@
 已执行验证：`python3 -m unittest discover -s tests -v`，19 项通过；`python3 examples/run_examples.py` 生成 7 组 CLI 离线实际输出和 Trace。使用 DeepSeek API 实际运行冲突和规则风险两组，分别得到 `pending_confirmation` 与 `blocked`；记录见 `examples/model_outputs/` 和 `examples/model_traces/`。离线 Mock 输出只证明程序流程、工具防护与持久化行为，不证明模型决策准确率。
 
 实际耗时：本次 AI 辅助实现、离线与真实模型验证、仓库交付约为 2026-11-01 22:23–23:03（北京时间），约 40 分钟。候选人个人用时和个人修改尚未发生，须在正式提交前据实补录。
+
+2026-11-03 根据评审报告，Codex 修复跨平台测试资源清理、并发同步点及软性时段提示，补跑 20 项测试、8 组离线示例和一条真实模型保存失败路径。该修改仍属 AI 辅助产出，候选人个人代码贡献未获得可核实记录。

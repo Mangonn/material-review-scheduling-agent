@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import redirect_stdout
+from contextlib import closing, redirect_stdout
 from threading import Barrier
 import unittest
 from pathlib import Path
@@ -34,7 +34,7 @@ class AgentAcceptanceTests(unittest.TestCase):
         return run(request, model=MockPolicy(), db_path=self.db, **kwargs)
 
     def count(self):
-        with sqlite3.connect(self.db) as connection:
+        with closing(sqlite3.connect(self.db)) as connection:
             return connection.execute("SELECT COUNT(*) FROM drafts").fetchone()[0]
 
     def test_normal_slot_saves_one_unpublished_draft(self):
@@ -82,21 +82,11 @@ class AgentAcceptanceTests(unittest.TestCase):
             tools = BusinessTools(self.db)
             try:
                 slot = request["requested_slot"]
+                availability = tools.query_slot(slot)
+                barrier.wait(timeout=10)
                 evidence = {"read_material": tools.read_material(request["material_id"]),
                             "check_rules": tools.check_rules(request["material_id"]),
-                            "queried_slots": {slot: tools.query_slot(slot)}}
-                original_existing = tools.existing
-                first_lookup = True
-
-                def synchronized_existing(key):
-                    nonlocal first_lookup
-                    result = original_existing(key)
-                    if first_lookup:
-                        first_lookup = False
-                        barrier.wait(timeout=5)
-                    return result
-
-                tools.existing = synchronized_existing
+                            "queried_slots": {slot: availability}}
                 return tools.save_draft(request, slot, evidence)
             finally:
                 tools.close()
@@ -106,6 +96,16 @@ class AgentAcceptanceTests(unittest.TestCase):
         self.assertTrue(all(item["saved"] for item in results))
         self.assertEqual(sorted(item["duplicate"] for item in results), [False, True])
         self.assertEqual(self.count(), 1)
+
+    def test_soft_conflict_explicitly_discloses_changed_slot(self):
+        request = json.loads((ROOT / "examples/inputs/conflict.json").read_text())
+        request["requirement"] = "soft"
+        result = run(request, model=MockPolicy(), db_path=self.db)
+        self.assertEqual(result["completion_status"], "draft_ready")
+        self.assertEqual(result["suggested_slot"], "2026-11-03T19:00:00+08:00")
+        self.assertTrue(any("18:00" in item and "19:00" in item
+                            for item in result["pending_confirmation"]))
+        self.assertFalse(result["published"])
 
     def test_exact_user_approval_updates_existing_draft_without_publishing(self):
         self.case("conflict")

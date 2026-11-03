@@ -67,3 +67,7 @@ python3 -m src.cli examples/inputs/conflict.json --mode openai --db work/model.s
 - [复盘](docs/05-retrospective.md)
 
 公开仓库：[Mangonn/material-review-scheduling-agent](https://github.com/Mangonn/material-review-scheduling-agent)。最终 commit SHA 以 GitHub `main` 分支为准。
+
+## 2026-11-03 评审后改进
+
+修正 SQLite 测试连接关闭与并发测试同步点；软性换时段也明确提示 18:00→19:00；新增真实模型保存失败 Trace。见 [评估](docs/03-evaluation.md)。

@@ -1,0 +1,103 @@
+{
+  "material_id": "M04",
+  "requested_slot": "2026-11-04T18:00:00+08:00",
+  "requirement": "hard",
+  "review_status": "approved",
+  "risk_reasons": [],
+  "missing_fields": [],
+  "suggested_slot": "2026-11-04T18:00:00+08:00",
+  "pending_confirmation": [],
+  "draft_status": "failed",
+  "draft": null,
+  "save_error": "simulated_storage_failure",
+  "completion_status": "failed",
+  "stop_reason": null,
+  "mode": "deepseek_chat",
+  "published": false,
+  "trace": [
+    {
+      "step": 1,
+      "actor": "deepseek_chat",
+      "action": "read_material",
+      "arguments": {
+        "material_id": "M04"
+      },
+      "observation": {
+        "found": true,
+        "material_id": "M04",
+        "material": {
+          "title": "产品开箱",
+          "rights": "owned",
+          "license": "internal",
+          "caption": "展示包装与配件",
+          "revision": 1
+        }
+      },
+      "decision_basis": "Inspect source metadata before review.",
+      "model_turn": 1,
+      "next_action": "check_rules"
+    },
+    {
+      "step": 2,
+      "actor": "deepseek_chat",
+      "action": "check_rules",
+      "arguments": {
+        "material_id": "M04"
+      },
+      "observation": {
+        "status": "approved",
+        "missing_fields": [],
+        "risks": []
+      },
+      "decision_basis": "Check required metadata and review rules for M04.",
+      "model_turn": 2,
+      "next_action": "query_slot"
+    },
+    {
+      "step": 3,
+      "actor": "deepseek_chat",
+      "action": "query_slot",
+      "arguments": {
+        "slot": "2026-11-04T18:00:00+08:00"
+      },
+      "observation": {
+        "slot": "2026-11-04T18:00:00+08:00",
+        "available": true,
+        "reason": "free",
+        "occupied_by": null,
+        "alternatives": [
+          "2026-11-03T19:00:00+08:00",
+          "2026-11-03T20:00:00+08:00"
+        ]
+      },
+      "decision_basis": "Verify the hard requested slot for M04.",
+      "model_turn": 3,
+      "next_action": "save_draft"
+    },
+    {
+      "step": 4,
+      "actor": "deepseek_chat",
+      "action": "save_draft",
+      "arguments": {
+        "slot": "2026-11-04T18:00:00+08:00"
+      },
+      "observation": {
+        "saved": false,
+        "error": "simulated_storage_failure"
+      },
+      "decision_basis": "Metadata complete, rules approved with no risks, and requested hard slot is free.",
+      "model_turn": 4,
+      "next_action": "finish"
+    },
+    {
+      "step": 5,
+      "actor": "deepseek_chat",
+      "action": "finish",
+      "arguments": {},
+      "observation": "stopped",
+      "decision_basis": "M04 passed review (no missing fields, no risks) and 2026-11-04T18:00:00+08:00 was free, but draft save failed with simulated_storage_failure; no publishing occurred.",
+      "model_turn": 5,
+      "next_action": null
+    }
+  ]
+}

@@ -13,12 +13,13 @@ test_normal_slot_saves_one_unpublished_draft (test_agent.AgentAcceptanceTests.te
 test_openai_adapter_returns_observation_to_model (test_agent.AgentAcceptanceTests.test_openai_adapter_returns_observation_to_model) ... ok
 test_rule_risk_blocks_save (test_agent.AgentAcceptanceTests.test_rule_risk_blocks_save) ... ok
 test_save_failure_is_explicit_and_not_counted_as_saved (test_agent.AgentAcceptanceTests.test_save_failure_is_explicit_and_not_counted_as_saved) ... ok
+test_soft_conflict_explicitly_discloses_changed_slot (test_agent.AgentAcceptanceTests.test_soft_conflict_explicitly_discloses_changed_slot) ... ok
 test_step_limit_returns_incomplete (test_agent.AgentAcceptanceTests.test_step_limit_returns_incomplete) ... ok
 test_tool_limit_returns_incomplete (test_agent.AgentAcceptanceTests.test_tool_limit_returns_incomplete) ... ok
 test_unavailable_database_returns_structured_failure (test_agent.AgentAcceptanceTests.test_unavailable_database_returns_structured_failure) ... ok
 test_wrong_approval_does_not_change_hard_time (test_agent.AgentAcceptanceTests.test_wrong_approval_does_not_change_hard_time) ... ok
 
 ----------------------------------------------------------------------
-Ran 19 tests in 0.132s
+Ran 20 tests in 0.202s
 
 OK

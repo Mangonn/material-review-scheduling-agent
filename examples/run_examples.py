@@ -27,6 +27,7 @@ EXPECTED = {
     "normal": "draft_ready", "missing": "needs_input", "risk": "blocked",
     "conflict": "pending_confirmation", "duplicate": "pending_confirmation",
     "approved_change": "draft_ready", "save_failure": "failed",
+    "soft_conflict": "draft_ready",
 }
 
 
@@ -46,9 +47,10 @@ with tempfile.TemporaryDirectory() as directory:
     results["duplicate"] = check("duplicate", invoke("conflict", conflict_db))
     results["approved_change"] = check("approved_change", invoke("approved_change", conflict_db))
     results["save_failure"] = check("save_failure", invoke("normal", base / "failure.sqlite3", fail_save=True))
+    results["soft_conflict"] = check("soft_conflict", invoke("soft_conflict", base / "soft.sqlite3"))
 OUTPUTS.mkdir(exist_ok=True)
 TRACES.mkdir(exist_ok=True)
 for name, result in results.items():
     (OUTPUTS / f"{name}.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     (TRACES / f"{name}.json").write_text(json.dumps(result["trace"], ensure_ascii=False, indent=2) + "\n")
-print("Generated 7 CLI outputs and 7 traces in examples/")
+print(f"Generated {len(results)} CLI outputs and traces in examples/")
